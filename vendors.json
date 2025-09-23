@@ -1,0 +1,679 @@
+[
+  {
+    "name": "Gubagoo",
+    "category": "Chat",
+    "patterns": [
+      "cdn\\.gg\\.",
+      "gg[-_]chat",
+      "gubagoo"
+    ]
+  },
+  {
+    "name": "CarNow",
+    "category": "Chat",
+    "patterns": [
+      "carnow",
+      "live-conversation"
+    ]
+  },
+  {
+    "name": "ActivEngage",
+    "category": "Chat",
+    "patterns": [
+      "activengage"
+    ]
+  },
+  {
+    "name": "CarChat24",
+    "category": "Chat",
+    "patterns": [
+      "carchat24"
+    ]
+  },
+  {
+    "name": "PERQ",
+    "category": "Chat",
+    "patterns": [
+      "\\bperq\\b",
+      "autoperq"
+    ]
+  },
+  {
+    "name": "Podium",
+    "category": "Chat",
+    "patterns": [
+      "podium\\.com/(widget|chat)",
+      "webchat\\.podium\\.com"
+    ]
+  },
+  {
+    "name": "Drift",
+    "category": "Chat",
+    "patterns": [
+      "drift\\.sh",
+      "driftt?\\.com"
+    ]
+  },
+  {
+    "name": "Intercom",
+    "category": "Chat",
+    "patterns": [
+      "intercom\\.io",
+      "intercomcdn\\.com"
+    ]
+  },
+  {
+    "name": "LiveChat",
+    "category": "Chat",
+    "patterns": [
+      "lccdn\\.org",
+      "livechatinc\\.com"
+    ]
+  },
+  {
+    "name": "Zendesk",
+    "category": "Chat",
+    "patterns": [
+      "zdassets\\.com",
+      "zendesk\\.com/chat"
+    ]
+  },
+  {
+    "name": "LivePerson",
+    "category": "Chat",
+    "patterns": [
+      "liveperson\\.net",
+      "lpsnmedia\\.net"
+    ]
+  },
+  {
+    "name": "Tidio",
+    "category": "Chat",
+    "patterns": [
+      "tidio\\.co"
+    ]
+  },
+  {
+    "name": "Kustomer",
+    "category": "Chat",
+    "patterns": [
+      "kustomerapp\\.com"
+    ]
+  },
+  {
+    "name": "Twilio Flex",
+    "category": "Chat",
+    "patterns": [
+      "flex-webchat",
+      "twilio"
+    ]
+  },
+  {
+    "name": "Salesforce Live Agent",
+    "category": "Chat",
+    "patterns": [
+      "liveagent",
+      "salesforceliveagent"
+    ]
+  },
+  {
+    "name": "Whisbi",
+    "category": "Chat",
+    "patterns": [
+      "whisbi"
+    ]
+  },
+  {
+    "name": "Google Tag Manager",
+    "category": "Analytics",
+    "patterns": [
+      "googletagmanager\\.com"
+    ]
+  },
+  {
+    "name": "Google Analytics",
+    "category": "Analytics",
+    "patterns": [
+      "gtag\\(",
+      "www\\.google-analytics\\.com"
+    ]
+  },
+  {
+    "name": "GA4 (gtag)",
+    "category": "Analytics",
+    "patterns": [
+      "gtag\\('config'"
+    ]
+  },
+  {
+    "name": "Segment",
+    "category": "Analytics",
+    "patterns": [
+      "cdn\\.segment\\.com",
+      "segmentapis?"
+    ]
+  },
+  {
+    "name": "Tealium",
+    "category": "Analytics",
+    "patterns": [
+      "tags\\.tiqcdn\\.com",
+      "tealium"
+    ]
+  },
+  {
+    "name": "Adobe Analytics",
+    "category": "Analytics",
+    "patterns": [
+      "omtrdc\\.net|2o7\\.net|adobedtm\\.com"
+    ]
+  },
+  {
+    "name": "New Relic",
+    "category": "Monitoring",
+    "patterns": [
+      "js-agent\\.newrelic\\.com",
+      "nr-data\\.net"
+    ]
+  },
+  {
+    "name": "Datadog RUM",
+    "category": "Monitoring",
+    "patterns": [
+      "datadoghq-browser-agent",
+      "dd_rum"
+    ]
+  },
+  {
+    "name": "Google Ads / DoubleClick",
+    "category": "Ads",
+    "patterns": [
+      "doubleclick\\.net",
+      "gads|adsbygoogle"
+    ]
+  },
+  {
+    "name": "Meta Pixel (Facebook)",
+    "category": "Ads",
+    "patterns": [
+      "connect\\.facebook\\.net/.*/fbevents\\.js",
+      "fbq\\("
+    ]
+  },
+  {
+    "name": "TikTok Pixel",
+    "category": "Ads",
+    "patterns": [
+      "analytics\\.tiktok\\.com",
+      "tiktok analytics"
+    ]
+  },
+  {
+    "name": "Microsoft Advertising (UET)",
+    "category": "Ads",
+    "patterns": [
+      "bat\\.bing\\.com",
+      "uetq"
+    ]
+  },
+  {
+    "name": "Criteo",
+    "category": "Ads",
+    "patterns": [
+      "criteo\\.com|criteo\\.net"
+    ]
+  },
+  {
+    "name": "The Trade Desk",
+    "category": "Ads",
+    "patterns": [
+      "adsrvr\\.org"
+    ]
+  },
+  {
+    "name": "LiveRamp",
+    "category": "Ads",
+    "patterns": [
+      "liveramp",
+      "rlcdn\\.com"
+    ]
+  },
+  {
+    "name": "Reddit Pixel",
+    "category": "Ads",
+    "patterns": [
+      "www\\.redditstatic\\.com/ads\\.js"
+    ]
+  },
+  {
+    "name": "Pinterest Tag",
+    "category": "Ads",
+    "patterns": [
+      "pintrk\\(",
+      "s\\.pinimg\\.com/ct/core\\.js"
+    ]
+  },
+  {
+    "name": "Hotjar",
+    "category": "UX",
+    "patterns": [
+      "hj\\(",
+      "static\\.hotjar\\.com|hotjar\\.com/c/hja"
+    ]
+  },
+  {
+    "name": "FullStory",
+    "category": "UX",
+    "patterns": [
+      "FS\\.init",
+      "fullstory\\.com|fs\\.js"
+    ]
+  },
+  {
+    "name": "Microsoft Clarity",
+    "category": "UX",
+    "patterns": [
+      "clarity\\.js",
+      "clarity\\.ms"
+    ]
+  },
+  {
+    "name": "YouTube IFrame API",
+    "category": "Widget",
+    "patterns": [
+      "youtube\\.com/iframe_api"
+    ]
+  },
+  {
+    "name": "Vimeo Player",
+    "category": "Widget",
+    "patterns": [
+      "player\\.vimeo\\.com"
+    ]
+  },
+  {
+    "name": "Vincue",
+    "category": "Uncategorized",
+    "patterns": [
+      "vincue\\.com"
+    ]
+  },
+  {
+    "name": "Complyauto",
+    "category": "Uncategorized",
+    "patterns": [
+      "complyauto\\.com"
+    ]
+  },
+  {
+    "name": "Secureoffersites",
+    "category": "Uncategorized",
+    "patterns": [
+      "secureoffersites\\.com"
+    ]
+  },
+  {
+    "name": "Foureyes",
+    "category": "Uncategorized",
+    "patterns": [
+      "foureyes\\.io"
+    ]
+  },
+  {
+    "name": "Orb",
+    "category": "Uncategorized",
+    "patterns": [
+      "orb\\.ee"
+    ]
+  },
+  {
+    "name": "Googletagmanager",
+    "category": "Uncategorized",
+    "patterns": [
+      "googletagmanager\\.com"
+    ]
+  },
+  {
+    "name": "Paragonhonda",
+    "category": "Uncategorized",
+    "patterns": [
+      "paragonhonda\\.com"
+    ]
+  },
+  {
+    "name": "Adobedtm",
+    "category": "Uncategorized",
+    "patterns": [
+      "adobedtm\\.com"
+    ]
+  },
+  {
+    "name": "Clarivoy",
+    "category": "Uncategorized",
+    "patterns": [
+      "clarivoy\\.com"
+    ]
+  },
+  {
+    "name": "Dealer",
+    "category": "Uncategorized",
+    "patterns": [
+      "dealer\\.com"
+    ]
+  },
+  {
+    "name": "Dealeron",
+    "category": "Uncategorized",
+    "patterns": [
+      "dealeron\\.com"
+    ]
+  },
+  {
+    "name": "Autofi",
+    "category": "Uncategorized",
+    "patterns": [
+      "autofi\\.com"
+    ]
+  },
+  {
+    "name": "Autodriven",
+    "category": "Uncategorized",
+    "patterns": [
+      "autodriven\\.com"
+    ]
+  },
+  {
+    "name": "Sincrod",
+    "category": "Uncategorized",
+    "patterns": [
+      "sincrod\\.com"
+    ]
+  },
+  {
+    "name": "Alpinenissan",
+    "category": "Uncategorized",
+    "patterns": [
+      "alpinenissan\\.com"
+    ]
+  },
+  {
+    "name": "Dlron",
+    "category": "Uncategorized",
+    "patterns": [
+      "dlron\\.us"
+    ]
+  },
+  {
+    "name": "Visualwebsiteoptimizer",
+    "category": "Uncategorized",
+    "patterns": [
+      "visualwebsiteoptimizer\\.com"
+    ]
+  },
+  {
+    "name": "Fluencyinc",
+    "category": "Uncategorized",
+    "patterns": [
+      "fluencyinc\\.co"
+    ]
+  },
+  {
+    "name": "Brickellchryslerdodgejeepram",
+    "category": "Uncategorized",
+    "patterns": [
+      "brickellchryslerdodgejeepram\\.com"
+    ]
+  },
+  {
+    "name": "Trustindex",
+    "category": "Uncategorized",
+    "patterns": [
+      "trustindex\\.io"
+    ]
+  },
+  {
+    "name": "Tecobi",
+    "category": "Uncategorized",
+    "patterns": [
+      "tecobi\\.com"
+    ]
+  },
+  {
+    "name": "Googleapis",
+    "category": "Uncategorized",
+    "patterns": [
+      "googleapis\\.com"
+    ]
+  },
+  {
+    "name": "Gstatic",
+    "category": "Uncategorized",
+    "patterns": [
+      "gstatic\\.com"
+    ]
+  },
+  {
+    "name": "Gmpg",
+    "category": "Uncategorized",
+    "patterns": [
+      "gmpg\\.org"
+    ]
+  },
+  {
+    "name": "Instagram",
+    "category": "Uncategorized",
+    "patterns": [
+      "instagram\\.com"
+    ]
+  },
+  {
+    "name": "Github",
+    "category": "Uncategorized",
+    "patterns": [
+      "github\\.com"
+    ]
+  },
+  {
+    "name": "Userway",
+    "category": "Uncategorized",
+    "patterns": [
+      "userway\\.org"
+    ]
+  },
+  {
+    "name": "Amazonaws",
+    "category": "Uncategorized",
+    "patterns": [
+      "amazonaws\\.com"
+    ]
+  },
+  {
+    "name": "Dealerinspire",
+    "category": "Uncategorized",
+    "patterns": [
+      "dealerinspire\\.com"
+    ]
+  },
+  {
+    "name": "Inventoryphotos",
+    "category": "Uncategorized",
+    "patterns": [
+      "inventoryphotos"
+    ]
+  },
+  {
+    "name": "Com\\u0022,\\u0022telephone\\u0022",
+    "category": "Uncategorized",
+    "patterns": [
+      "com\\\\u0022,\\\\u0022telephone\\\\u0022"
+    ]
+  },
+  {
+    "name": "X",
+    "category": "Uncategorized",
+    "patterns": [
+      "x\\.com"
+    ]
+  },
+  {
+    "name": "Resources",
+    "category": "Uncategorized",
+    "patterns": [
+      "resources"
+    ]
+  },
+  {
+    "name": "Carfax",
+    "category": "Uncategorized",
+    "patterns": [
+      "carfax\\.com"
+    ]
+  },
+  {
+    "name": "Acsbapp",
+    "category": "Uncategorized",
+    "patterns": [
+      "acsbapp\\.com"
+    ]
+  },
+  {
+    "name": "Bidr",
+    "category": "Uncategorized",
+    "patterns": [
+      "bidr\\.io"
+    ]
+  },
+  {
+    "name": "Facebook",
+    "category": "Uncategorized",
+    "patterns": [
+      "facebook\\.net"
+    ]
+  },
+  {
+    "name": "Cloudfront",
+    "category": "Uncategorized",
+    "patterns": [
+      "cloudfront\\.net"
+    ]
+  },
+  {
+    "name": "Elfsight",
+    "category": "Uncategorized",
+    "patterns": [
+      "elfsight\\.com"
+    ]
+  },
+  {
+    "name": "Toyota",
+    "category": "Uncategorized",
+    "patterns": [
+      "toyota\\.com"
+    ]
+  },
+  {
+    "name": "Roadster",
+    "category": "Uncategorized",
+    "patterns": [
+      "roadster\\.com"
+    ]
+  },
+  {
+    "name": "Edmunds",
+    "category": "Uncategorized",
+    "patterns": [
+      "edmunds\\.com"
+    ]
+  },
+  {
+    "name": "Ondigitalocean",
+    "category": "Uncategorized",
+    "patterns": [
+      "ondigitalocean\\.app"
+    ]
+  },
+  {
+    "name": "Cargurus",
+    "category": "Uncategorized",
+    "patterns": [
+      "cargurus\\.com"
+    ]
+  },
+  {
+    "name": "Longotoyota",
+    "category": "Uncategorized",
+    "patterns": [
+      "longotoyota\\.com"
+    ]
+  },
+  {
+    "name": "Letzchat",
+    "category": "Uncategorized",
+    "patterns": [
+      "letzchat\\.pro"
+    ]
+  },
+  {
+    "name": "Tradepending",
+    "category": "Uncategorized",
+    "patterns": [
+      "tradepending\\.com"
+    ]
+  },
+  {
+    "name": "Maze",
+    "category": "Uncategorized",
+    "patterns": [
+      "maze\\.co"
+    ]
+  },
+  {
+    "name": "Universaltoyota",
+    "category": "Uncategorized",
+    "patterns": [
+      "universaltoyota\\.com"
+    ]
+  },
+  {
+    "name": "Washingtonpost",
+    "category": "Uncategorized",
+    "patterns": [
+      "washingtonpost\\.com"
+    ]
+  },
+  {
+    "name": "The360mag",
+    "category": "Uncategorized",
+    "patterns": [
+      "the360mag\\.com"
+    ]
+  },
+  {
+    "name": "Cnet",
+    "category": "Uncategorized",
+    "patterns": [
+      "cnet\\.com"
+    ]
+  },
+  {
+    "name": "Wikipedia",
+    "category": "Uncategorized",
+    "patterns": [
+      "wikipedia\\.org"
+    ]
+  },
+  {
+    "name": "Netflix",
+    "category": "Uncategorized",
+    "patterns": [
+      "netflix\\.com"
+    ]
+  },
+  {
+    "name": "Consumerreports",
+    "category": "Uncategorized",
+    "patterns": [
+      "consumerreports\\.org"
+    ]
+  }
+]
