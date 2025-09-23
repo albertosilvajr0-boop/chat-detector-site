@@ -1,4 +1,6 @@
-﻿from flask import Flask, request, render_template_string, send_file, redirect, url_for
+﻿import os
+READ_ONLY_FS = os.getenv('READ_ONLY_FS','0') -eq '1'
+from flask import Flask, request, render_template_string, send_file, redirect, url_for
 import requests, re, csv, io, json, os, time, html as htmlmod
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse, urljoin
@@ -338,3 +340,4 @@ def export_prices():
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
+
