@@ -1,4 +1,5 @@
 import { Routes, Route, Link } from 'react-router-dom'
+import AdminWidget from './components/AdminWidget'
 import Home from './pages/Home'
 import Property from './pages/Property'
 import Thanks from './pages/Thanks'
@@ -41,6 +42,8 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      <AdminWidget />
     </div>
   )
 }
