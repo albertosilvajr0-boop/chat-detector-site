@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   analyzeParcel, packetUrl, fmtMoney, fmtPct, type CompAnalysis,
@@ -68,7 +68,7 @@ function Protestable({
   const [submitting, setSubmitting] = useState(false)
   const [submitErr, setSubmitErr] = useState<string | null>(null)
 
-  async function handleDownload(e: React.FormEvent) {
+  async function handleDownload(e: FormEvent) {
     e.preventDefault()
     if (!email || !email.includes('@')) {
       setSubmitErr('Please enter a valid email')
@@ -79,8 +79,15 @@ function Protestable({
       await captureLead({
         email,
         propertyId: analysis.subject.PropertyId,
+        situsAddress: analysis.subject.SitusAddress,
+        owner: analysis.subject.OwnerFullName,
         appraisedValue: analysis.subject.AppraisedValue,
+        targetValue: analysis.target_value ?? undefined,
+        estimatedReduction: analysis.estimated_reduction ?? undefined,
         estimatedSavings: analysis.estimated_annual_tax_savings ?? undefined,
+        isProtestable: true,
+        requestType: 'packet',
+        reason: analysis.reason,
       })
       // Trigger PDF download in a new tab; navigate to thanks page after.
       window.open(packetUrl(analysis.subject.PropertyId), '_blank')
@@ -217,7 +224,82 @@ function NotProtestable({ analysis }: { analysis: CompAnalysis }) {
           and PIN.
         </p>
       </div>
+
+      <InfoRequestForm analysis={analysis} />
     </div>
+  )
+}
+
+function InfoRequestForm({ analysis }: { analysis: CompAnalysis }) {
+  const [email, setEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitErr, setSubmitErr] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState(false)
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!email || !email.includes('@')) {
+      setSubmitErr('Please enter a valid email')
+      return
+    }
+
+    setSubmitting(true)
+    setSubmitErr(null)
+    try {
+      await captureLead({
+        email,
+        propertyId: analysis.subject.PropertyId,
+        situsAddress: analysis.subject.SitusAddress,
+        owner: analysis.subject.OwnerFullName,
+        appraisedValue: analysis.subject.AppraisedValue,
+        targetValue: analysis.target_value ?? undefined,
+        estimatedReduction: analysis.estimated_reduction ?? undefined,
+        estimatedSavings: analysis.estimated_annual_tax_savings ?? undefined,
+        isProtestable: analysis.is_protestable,
+        requestType: 'info',
+        reason: analysis.reason,
+      })
+      setSubmitted(true)
+    } catch (e: unknown) {
+      setSubmitErr(e instanceof Error ? e.message : 'Could not save your email')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (submitted) {
+    return (
+      <p className="mt-5 rounded bg-emerald-50 border border-emerald-100 p-4 text-sm font-semibold text-money">
+        Thanks. Your address and email were saved for follow-up.
+      </p>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-5 rounded border border-bcad-100 bg-white p-4">
+      <h2 className="text-sm font-semibold text-bcad-700">Send me this address summary</h2>
+      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className="flex-1 px-4 py-2 border border-bcad-100 rounded-md focus:outline-none focus:ring-2 focus:ring-bcad-500"
+        />
+        <button
+          type="submit"
+          disabled={submitting}
+          className="bg-bcad-700 text-white px-5 py-2 rounded-md hover:bg-bcad-900 disabled:opacity-50"
+        >
+          {submitting ? 'Saving...' : 'Send summary'}
+        </button>
+      </div>
+      {submitErr && <p className="mt-2 text-sm text-red-700">{submitErr}</p>}
+      <p className="mt-3 text-xs text-bcad-900/50">
+        We store the email with this property address so you can get follow-up help.
+      </p>
+    </form>
   )
 }
 
