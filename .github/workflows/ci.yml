@@ -1,0 +1,126 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - sprint/**
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend smoke test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Create tiny appraisal-roll fixture
+        run: |
+          python - <<'PY'
+          import csv
+
+          fieldnames = [
+              "PropertyId",
+              "GeoId",
+              "ZipCode",
+              "DistanceFrom78233",
+              "OwnerFullName",
+              "SitusAddress",
+              "LegalDescription",
+              "MarketValue",
+              "AppraisedValue",
+              "AssessedValue",
+              "Year",
+              "GroupCodes",
+              "PropertyTypeCode",
+          ]
+          rows = [
+              {
+                  "PropertyId": 1001,
+                  "GeoId": "001-001-001",
+                  "ZipCode": 78233,
+                  "DistanceFrom78233": 0.1,
+                  "OwnerFullName": "Sample Owner One",
+                  "SitusAddress": "101 SAMPLE ST",
+                  "LegalDescription": "NCB 1234 BLK 1 LOT 1",
+                  "MarketValue": 250000,
+                  "AppraisedValue": 240000,
+                  "AssessedValue": 230000,
+                  "Year": 2026,
+                  "GroupCodes": "HS",
+                  "PropertyTypeCode": "R (Real)",
+              },
+              {
+                  "PropertyId": 1002,
+                  "GeoId": "001-001-002",
+                  "ZipCode": 78233,
+                  "DistanceFrom78233": 0.2,
+                  "OwnerFullName": "Sample Owner Two",
+                  "SitusAddress": "102 SAMPLE ST",
+                  "LegalDescription": "NCB 1234 BLK 1 LOT 2",
+                  "MarketValue": 255000,
+                  "AppraisedValue": 245000,
+                  "AssessedValue": 235000,
+                  "Year": 2026,
+                  "GroupCodes": "HS",
+                  "PropertyTypeCode": "R (Real)",
+              },
+          ]
+          with open("/tmp/bcad_sample.csv", "w", newline="") as f:
+              writer = csv.DictWriter(f, fieldnames=fieldnames)
+              writer.writeheader()
+              writer.writerows(rows)
+          PY
+
+      - name: Build sample SQLite database
+        run: python build_db.py /tmp/bcad_sample.csv /tmp/bcad.db
+
+      - name: Check API health using sample database
+        run: |
+          DB_PATH=/tmp/bcad.db python - <<'PY'
+          import api
+
+          result = api.healthz()
+          assert result == {"ok": True, "parcels": 2}, result
+          print(result)
+          PY
