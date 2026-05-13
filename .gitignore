@@ -1,4 +1,39 @@
-﻿.venv/
-__pycache__/
-*.pyc
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 *.log
+.DS_Store
+
+# --- Python / backend ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# The SQLite database is ~210 MB — built locally and bundled into the Docker
+# image. Don't commit it.
+backend/bcad.db
+backend/*.db
+backend/*.csv
+
+# Sample/test outputs
+backend/preview*.png
+backend/sample_*.pdf
+
+# --- Firebase / GCP ---
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+*.json.tmp
+serviceAccountKey*.json
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+Thumbs.db
