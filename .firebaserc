@@ -1,5 +1,15 @@
 {
   "projects": {
-    "default": "REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID"
-  }
+    "default": "civicsync-79bbb"
+  },
+  "targets": {
+    "civicsync-79bbb": {
+      "hosting": {
+        "protest-helper": [
+          "bexar-protest-helper"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
