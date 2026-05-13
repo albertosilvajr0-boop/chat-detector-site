@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public lead capture from the website.
+    // Anyone can create a lead document, but only the project owner (via
+    // Firebase Console or Admin SDK) can read, update, or delete.
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly(
+                      ['email','propertyId','appraisedValue','estimatedSavings',
+                       'name','phone','ts','userAgent','referrer'])
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() < 200
+                    && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+                    && request.resource.data.propertyId is number;
+      allow read, update, delete: if false;
+    }
+    // Everything else: locked down.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

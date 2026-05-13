@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply bg-bcad-50 text-bcad-900 font-sans antialiased;
+}
+
+/* Smooth scrollbar styling on dark surfaces */
+.cmp-row:nth-child(odd) {
+  @apply bg-white;
+}
+.cmp-row:nth-child(even) {
+  @apply bg-bcad-50;
+}
