@@ -51,6 +51,10 @@ export default function Property() {
         Search another {analysis.county.short_label} address
       </Link>
 
+      <div className="mt-4 inline-flex rounded bg-bcad-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-bcad-700">
+        {analysis.county.label}
+      </div>
+
       <h1 className="mt-4 text-2xl font-bold text-bcad-700">
         {analysis.subject.SitusAddress}
       </h1>

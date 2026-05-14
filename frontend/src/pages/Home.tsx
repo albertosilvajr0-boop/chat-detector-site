@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
-  COUNTY_OPTIONS,
   countyInfo,
   fmtMoney,
   normalizeCounty,
@@ -32,7 +31,7 @@ const COUNTY_COPY: Record<CountyId, { example: string; subhead: string; stats: A
 }
 
 export default function Home() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const county = normalizeCounty(searchParams.get('county') || undefined)
   const info = countyInfo(county)
   const copy = COUNTY_COPY[county]
@@ -72,30 +71,10 @@ export default function Home() {
     return () => window.clearTimeout(debounceRef.current)
   }, [county, q])
 
-  function selectCounty(nextCounty: CountyId) {
-    setSearchParams(nextCounty === 'bexar' ? {} : { county: nextCounty })
-  }
-
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <div className="mb-6">
-        <div className="inline-flex rounded-md border border-bcad-100 bg-white p-1 shadow-sm">
-          {COUNTY_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => selectCounty(option.id)}
-              className={`rounded px-4 py-2 text-sm font-semibold transition-colors ${
-                county === option.id
-                  ? 'bg-bcad-700 text-white'
-                  : 'text-bcad-700 hover:bg-bcad-50'
-              }`}
-            >
-              {option.short_label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-bcad-900/50">
+        <p className="text-xs font-semibold uppercase tracking-wide text-bcad-900/50">
           More counties coming
         </p>
       </div>
@@ -124,7 +103,7 @@ export default function Home() {
           className="w-full px-4 py-3 border border-bcad-100 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-bcad-500"
         />
         <p className="mt-2 text-xs text-bcad-900/60">
-          Type at least 3 characters. City name is optional.
+          Type at least 3 characters. Search by address or owner name.
         </p>
 
         {error && (

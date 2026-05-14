@@ -152,7 +152,7 @@ def search_parcels_by_address(
     county: str = "bexar",
     limit: int = 10,
 ) -> list:
-    """Address search using FTS5. Returns list of dicts."""
+    """Address or owner search using FTS5. Returns list of dicts."""
     county = valid_county(county)
     tokens = [t for t in re.split(r"\W+", query.upper()) if t]
     if not tokens:
@@ -164,10 +164,10 @@ def search_parcels_by_address(
             """
             SELECT p.PropertyId, p.County, p.SitusAddress, p.OwnerFullName,
                    p.AppraisedValue, p.ZipCode
-            FROM addr_fts f
+            FROM parcel_fts f
             JOIN parcels p ON p.rowid = f.rowid
-            WHERE addr_fts MATCH ? AND p.County = ?
-            ORDER BY bm25(addr_fts)
+            WHERE parcel_fts MATCH ? AND p.County = ?
+            ORDER BY bm25(parcel_fts)
             LIMIT ?
             """,
             (fts_q, county, limit),
