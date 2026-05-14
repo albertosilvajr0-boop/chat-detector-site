@@ -24,6 +24,7 @@ COMMON_COLUMNS = [
     "ZipCode",
     "DistanceFromAnchor",
     "OwnerFullName",
+    "NormOwner",
     "SitusAddress",
     "NormAddr",
     "LegalDescription",
@@ -161,6 +162,7 @@ def build_bexar(csv_path):
     out["ZipCode"] = pd.to_numeric(res["ZipCode"], errors="coerce").astype("Int64")
     out["DistanceFromAnchor"] = pd.to_numeric(res["DistanceFrom78233"], errors="coerce")
     out["OwnerFullName"] = res["OwnerFullName"].apply(clean_text)
+    out["NormOwner"] = res["OwnerFullName"].apply(norm_addr)
     out["SitusAddress"] = res["SitusAddress"].apply(clean_text)
     out["NormAddr"] = res["SitusAddress"].apply(norm_addr)
     out["LegalDescription"] = res["LegalDescription"].apply(clean_text)
@@ -218,6 +220,7 @@ def build_arapahoe(csv_path):
     out["ZipCode"] = res["Zip"].apply(clean_zip).astype("Int64")
     out["DistanceFromAnchor"] = pd.to_numeric(res["DistanceFrom80112"], errors="coerce")
     out["OwnerFullName"] = res["Owner"].apply(clean_text)
+    out["NormOwner"] = res["Owner"].apply(norm_addr)
     out["SitusAddress"] = display_addr
     out["NormAddr"] = norm_search
     out["LegalDescription"] = res["Neighborhood"].apply(clean_text)
@@ -264,15 +267,15 @@ def write_sqlite(frames, db_path):
         "ON parcels(County, NeighborhoodCode, PropertyUseGroup, AppraisedValue)"
     )
 
-    print("[DB 3/3] Building FTS5 address search...")
+    print("[DB 3/3] Building FTS5 address + owner search...")
     cur.execute(
-        "CREATE VIRTUAL TABLE addr_fts USING fts5("
-        "NormAddr, content='parcels', content_rowid='rowid'"
+        "CREATE VIRTUAL TABLE parcel_fts USING fts5("
+        "NormAddr, NormOwner, content='parcels', content_rowid='rowid'"
         ")"
     )
     cur.execute(
-        "INSERT INTO addr_fts(rowid, NormAddr) "
-        "SELECT rowid, NormAddr FROM parcels"
+        "INSERT INTO parcel_fts(rowid, NormAddr, NormOwner) "
+        "SELECT rowid, NormAddr, NormOwner FROM parcels"
     )
     con.commit()
 

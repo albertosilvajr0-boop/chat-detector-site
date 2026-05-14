@@ -51,6 +51,10 @@ export default function Property() {
         Search another {analysis.county.short_label} address
       </Link>
 
+      <div className="mt-4 inline-flex rounded bg-bcad-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-bcad-700">
+        {analysis.county.label}
+      </div>
+
       <h1 className="mt-4 text-2xl font-bold text-bcad-700">
         {analysis.subject.SitusAddress}
       </h1>
@@ -180,6 +184,7 @@ function Protestable({
 function NotProtestable({ analysis }: { analysis: CompAnalysis }) {
   const isInsufficient = analysis.reason.startsWith('insufficient_comps')
   const isNotOver = analysis.reason === 'not_overassessed'
+  const isSmallReduction = analysis.reason === 'reduction_too_small'
   const isFlagged = analysis.reason === 'large_reduction_needs_human_review'
 
   return (
@@ -208,6 +213,23 @@ function NotProtestable({ analysis }: { analysis: CompAnalysis }) {
             We could not find at least 5 comparable properties using this county's tight
             comp rules. Filing may still be worthwhile if you have recent sales, condition
             photos, repair estimates, or other property-specific evidence.
+          </p>
+        </>
+      )}
+      {isSmallReduction && (
+        <>
+          <h2 className="text-lg font-semibold text-bcad-700">
+            Your value is close to the comparable range
+          </h2>
+          <p className="mt-2 text-bcad-900/80">
+            Your {analysis.county.assessor_short} value of{' '}
+            <strong>{fmtMoney(analysis.subject.AppraisedValue)}</strong> is above the
+            median of {analysis.comp_count_total} tight comparable properties (
+            <strong>{fmtMoney(analysis.median_appraised)}</strong>), but the estimated
+            gap of <strong>{fmtMoney(analysis.estimated_reduction)}</strong>{' '}
+            ({fmtPct(analysis.estimated_pct_reduction)}) is below this tool's packet
+            threshold. Filing may still be worthwhile if you have condition issues,
+            recent purchase price, or stronger property-specific evidence.
           </p>
         </>
       )}

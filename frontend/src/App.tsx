@@ -1,20 +1,47 @@
-import { Link, Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import AdminWidget from './components/AdminWidget'
 import Home from './pages/Home'
 import Property from './pages/Property'
 import Thanks from './pages/Thanks'
+import { COUNTY_OPTIONS, normalizeCounty, type CountyId } from './lib/api'
 
 export default function App() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const activeCounty = currentCounty(location.pathname, location.search)
+
+  function selectCounty(county: CountyId) {
+    navigate(county === 'bexar' ? '/' : `/?county=${county}`)
+  }
+
   return (
     <div className="min-h-full flex flex-col">
       <header className="bg-bcad-700 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <Link to="/" className="font-bold text-lg">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <Link to="/" className="font-bold text-lg leading-tight">
             Bexar + Arapahoe Protest Helper
           </Link>
-          <span className="text-xs font-semibold uppercase tracking-wide text-bcad-100">
-            More counties coming
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex rounded-md border border-white/20 bg-white/10 p-1">
+              {COUNTY_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => selectCounty(option.id)}
+                  className={`rounded px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    activeCounty === option.id
+                      ? 'bg-white text-bcad-700'
+                      : 'text-bcad-100 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {option.short_label}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs font-semibold uppercase tracking-wide text-bcad-100 whitespace-nowrap">
+              More counties coming
+            </span>
+          </div>
         </div>
       </header>
 
@@ -41,4 +68,10 @@ export default function App() {
       <AdminWidget />
     </div>
   )
+}
+
+function currentCounty(pathname: string, search: string): CountyId {
+  const routeCounty = pathname.match(/^\/property\/(bexar|arapahoe)\//)?.[1]
+  if (routeCounty) return normalizeCounty(routeCounty)
+  return normalizeCounty(new URLSearchParams(search).get('county') || undefined)
 }

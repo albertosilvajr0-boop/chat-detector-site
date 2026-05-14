@@ -52,7 +52,7 @@ gcloud run deploy protest-helper \
 | --- | --- | --- |
 | GET | `/healthz` | Health plus total/county parcel counts |
 | GET | `/counties` | Supported county metadata |
-| GET | `/search?county=bexar&q=text&limit=10` | List matching parcels by address |
+| GET | `/search?county=bexar&q=text&limit=10` | List matching parcels by address or owner name |
 | GET | `/analyze/{county}/{property_id}` | Full analysis JSON |
 | GET | `/packet/{county}/{property_id}` | PDF download when comps support a reduction |
 
