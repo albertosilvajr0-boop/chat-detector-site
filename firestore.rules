@@ -26,14 +26,18 @@ service cloud.firestore {
     // Anyone can create a lead document; only the admin Firebase Auth user can read it.
     match /leads/{leadId} {
       allow create: if request.resource.data.keys().hasOnly(
-                      ['email','propertyId','situsAddress','owner','appraisedValue',
+                      ['email','county','countyLabel','propertyId','situsAddress','owner','appraisedValue',
                        'targetValue','estimatedReduction','estimatedSavings',
                        'isProtestable','requestType','reason',
                        'name','phone','ts','userAgent','referrer'])
                     && request.resource.data.email is string
                     && request.resource.data.email.size() < 200
                     && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
-                    && request.resource.data.propertyId is number
+                    && request.resource.data.county in ['bexar', 'arapahoe']
+                    && hasOptionalString('countyLabel', 80)
+                    && ((request.resource.data.propertyId is string
+                        && request.resource.data.propertyId.size() < 80)
+                      || request.resource.data.propertyId is number)
                     && hasOptionalString('situsAddress', 300)
                     && hasOptionalString('owner', 300)
                     && hasOptionalNumber('appraisedValue')
