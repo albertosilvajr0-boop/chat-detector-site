@@ -69,7 +69,7 @@ export async function captureLead(lead: Lead): Promise<void> {
     return
   }
   await addDoc(collection(db, 'leads'), {
-    ...lead,
+    ...withoutUndefined(lead),
     ts: serverTimestamp(),
     userAgent: navigator.userAgent,
     referrer: document.referrer || null,
@@ -160,4 +160,10 @@ function timestampLabel(value: unknown): string | undefined {
     return value.toDate().toLocaleString()
   }
   return undefined
+}
+
+function withoutUndefined<T extends object>(input: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(input).filter(([, value]) => value !== undefined),
+  ) as Partial<T>
 }
