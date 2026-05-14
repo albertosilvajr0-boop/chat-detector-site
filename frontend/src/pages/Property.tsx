@@ -169,7 +169,7 @@ function Protestable({
         </form>
         {submitErr && <p className="mt-2 text-sm text-red-700">{submitErr}</p>}
         <p className="mt-3 text-xs text-bcad-900/50">
-          We store your email with this address so you can receive deadline reminders and follow-up tips.
+          We store your email with this address for deadline reminders and follow-up tips.
           No spam, no sharing.
         </p>
       </div>
@@ -289,7 +289,7 @@ function InfoRequestForm({ analysis }: { analysis: CompAnalysis }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-5 rounded border border-bcad-100 bg-white p-4">
-      <h2 className="text-sm font-semibold text-bcad-700">Send me this address summary</h2>
+      <h2 className="text-sm font-semibold text-bcad-700">Save this address for follow-up</h2>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row">
         <input
           type="email"
@@ -304,12 +304,12 @@ function InfoRequestForm({ analysis }: { analysis: CompAnalysis }) {
           disabled={submitting}
           className="bg-bcad-700 text-white px-5 py-2 rounded-md hover:bg-bcad-900 disabled:opacity-50"
         >
-          {submitting ? 'Saving...' : 'Send summary'}
+          {submitting ? 'Saving...' : 'Save for follow-up'}
         </button>
       </div>
       {submitErr && <p className="mt-2 text-sm text-red-700">{submitErr}</p>}
       <p className="mt-3 text-xs text-bcad-900/50">
-        We store the email with this county, property address, and value summary.
+        We store the email with this county, property address, and value summary. No automatic email is sent yet.
       </p>
     </form>
   )
