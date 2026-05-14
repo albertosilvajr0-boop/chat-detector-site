@@ -46,6 +46,13 @@
           "region": "us-central1"
         }
       },
+      {
+        "source": "/admin/protest-candidates.csv",
+        "run": {
+          "serviceId": "protest-helper",
+          "region": "us-central1"
+        }
+      },
       { "source": "**", "destination": "/index.html" }
     ],
     "headers": [

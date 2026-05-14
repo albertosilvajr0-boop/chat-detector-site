@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Bundle the prebuilt SQLite into the image. ~210 MB, well under Cloud Run's
+# Bundle the prebuilt SQLite into the image. The combined county DB is well under Cloud Run's
 # 32 GB image limit. The DB is read-only so this is safe.
 COPY bcad.db /app/bcad.db
 COPY comp_engine.py pdf_packet.py api.py /app/

@@ -7,12 +7,14 @@ Endpoints:
   GET /search?county={bexar|arapahoe}&q={text}&limit=10
   GET /analyze/{county}/{property_id}
   GET /packet/{county}/{property_id}
+  GET /admin/protest-candidates.csv?county={bexar|arapahoe}
 
 Legacy Bexar routes are retained:
   GET /analyze/{property_id}
   GET /packet/{property_id}
 """
 
+import csv
 import io
 import os
 import sqlite3
@@ -147,3 +149,105 @@ def packet_county_endpoint(county: str, property_id: str):
 @app.get("/packet/{property_id}")
 def packet_legacy_endpoint(property_id: str):
     return packet_county_endpoint("bexar", property_id)
+
+
+@app.get("/admin/protest-candidates.csv")
+def protest_candidates_csv(county: str = "all"):
+    county_key = (county or "all").lower()
+    if county_key != "all":
+        try:
+            county_key = valid_county(county_key)
+        except ValueError as e:
+            raise HTTPException(400, str(e))
+
+    con = _con()
+    exists = con.execute(
+        """
+        SELECT 1 FROM sqlite_master
+        WHERE type = 'table' AND name = 'protest_candidates'
+        """
+    ).fetchone()
+    if not exists:
+        con.close()
+        raise HTTPException(503, "protest candidate export is not available")
+
+    filename_county = county_key if county_key != "all" else "all_counties"
+    return StreamingResponse(
+        _candidate_csv_rows(con, county_key),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="protest_candidates_{filename_county}.csv"'
+            )
+        },
+    )
+
+
+def _candidate_csv_rows(con: sqlite3.Connection, county: str):
+    headers = [
+        "county",
+        "property_id",
+        "situs_address",
+        "owner",
+        "zip_code",
+        "appraised_value",
+        "recommended_value",
+        "estimated_reduction",
+        "estimated_pct_reduction",
+        "estimated_annual_tax_savings",
+        "estimated_savings_note",
+        "comp_count",
+        "geography_tier_used",
+        "reason",
+    ]
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    def emit(row):
+        writer.writerow(row)
+        chunk = output.getvalue()
+        output.seek(0)
+        output.truncate(0)
+        return chunk
+
+    def number(value, digits=2):
+        if value is None:
+            return ""
+        return f"{float(value):.{digits}f}"
+
+    try:
+        yield emit(headers)
+        sql = """
+            SELECT County, PropertyId, SitusAddress, OwnerFullName, ZipCode,
+                   AppraisedValue, RecommendedValue, EstimatedReduction,
+                   EstimatedPctReduction, EstimatedAnnualTaxSavings,
+                   EstimatedSavingsNote, CompCount, GeographyTierUsed, Reason
+            FROM protest_candidates
+        """
+        params = ()
+        if county != "all":
+            sql += " WHERE County = ?"
+            params = (county,)
+        sql += " ORDER BY County, EstimatedReduction DESC, PropertyId"
+
+        for row in con.execute(sql, params):
+            yield emit(
+                [
+                    row["County"],
+                    row["PropertyId"],
+                    row["SitusAddress"],
+                    row["OwnerFullName"],
+                    row["ZipCode"],
+                    number(row["AppraisedValue"]),
+                    number(row["RecommendedValue"]),
+                    number(row["EstimatedReduction"]),
+                    number(row["EstimatedPctReduction"]),
+                    number(row["EstimatedAnnualTaxSavings"]),
+                    row["EstimatedSavingsNote"],
+                    row["CompCount"],
+                    row["GeographyTierUsed"],
+                    row["Reason"],
+                ]
+            )
+    finally:
+        con.close()

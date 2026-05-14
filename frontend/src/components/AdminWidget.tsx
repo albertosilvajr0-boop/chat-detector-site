@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { User } from 'firebase/auth'
-import { fmtMoney } from '../lib/api'
+import { COUNTY_OPTIONS, fmtMoney, protestCandidatesCsvUrl } from '../lib/api'
 import {
   ADMIN_EMAIL,
   isAdminUser,
@@ -159,6 +159,30 @@ export default function AdminWidget() {
                     Sign out
                   </button>
                 </div>
+              </div>
+
+              <div className="mt-3 rounded-md border border-bcad-100 bg-bcad-50 p-3">
+                <p className="text-xs font-semibold text-bcad-700">Candidate exports</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {COUNTY_OPTIONS.map((county) => (
+                    <a
+                      key={county.id}
+                      href={protestCandidatesCsvUrl(county.id)}
+                      className="rounded-md bg-bcad-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-bcad-900"
+                    >
+                      {county.short_label} CSV
+                    </a>
+                  ))}
+                  <a
+                    href={protestCandidatesCsvUrl('all')}
+                    className="rounded-md border border-bcad-100 bg-white px-3 py-1.5 text-xs font-semibold text-bcad-700 hover:bg-bcad-50"
+                  >
+                    All CSV
+                  </a>
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-bcad-900/60">
+                  Includes current value, recommended value, reduction, percent, and estimated savings.
+                </p>
               </div>
 
               {error && <p className="mt-3 rounded bg-red-50 p-3 text-xs text-red-800">{error}</p>}
