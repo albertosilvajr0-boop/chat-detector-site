@@ -19,7 +19,7 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# The SQLite database is ~210 MB — built locally and bundled into the Docker
+# The SQLite database is large and built locally for bundling into the Docker
 # image. Don't commit it.
 backend/bcad.db
 backend/*.db

@@ -55,5 +55,6 @@ gcloud run deploy protest-helper \
 | GET | `/search?county=bexar&q=text&limit=10` | List matching parcels by address or owner name |
 | GET | `/analyze/{county}/{property_id}` | Full analysis JSON |
 | GET | `/packet/{county}/{property_id}` | PDF download when comps support a reduction |
+| GET | `/admin/protest-candidates.csv?county=bexar` | CSV of precomputed protest candidates |
 
 Legacy Bexar routes `/analyze/{property_id}` and `/packet/{property_id}` remain available.

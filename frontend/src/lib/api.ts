@@ -171,6 +171,12 @@ export function packetUrl(county: CountyId, propertyId: string): string {
   return `${API_BASE}/packet/${county}/${encodeURIComponent(propertyId)}`
 }
 
+export function protestCandidatesCsvUrl(county: CountyId | 'all'): string {
+  const url = new URL(`${API_BASE}/admin/protest-candidates.csv`)
+  url.searchParams.set('county', county)
+  return url.toString()
+}
+
 export function fmtMoney(v: number | null | undefined, fallback = '-'): string {
   if (v == null) return fallback
   return new Intl.NumberFormat('en-US', {
