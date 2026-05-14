@@ -178,13 +178,17 @@ export default function AdminWidget() {
                         </p>
                       </div>
                       <span className="shrink-0 rounded bg-bcad-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-bcad-700">
-                        {lead.requestType || 'info'}
+                        {lead.countyLabel || lead.county}
                       </span>
                     </div>
                     <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-bcad-900/70">
+                      <dt>Request</dt>
+                      <dd className="text-right">{lead.requestType || 'info'}</dd>
+                      <dt>Property ID</dt>
+                      <dd className="text-right">{lead.propertyId}</dd>
                       <dt>Owner</dt>
                       <dd className="text-right">{lead.owner || 'Unknown'}</dd>
-                      <dt>BCAD</dt>
+                      <dt>Current value</dt>
                       <dd className="text-right">{fmtMoney(lead.appraisedValue)}</dd>
                       <dt>Target</dt>
                       <dd className="text-right">{fmtMoney(lead.targetValue)}</dd>

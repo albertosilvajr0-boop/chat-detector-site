@@ -1,29 +1,37 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  analyzeParcel, packetUrl, fmtMoney, fmtPct, type CompAnalysis,
+  analyzeParcel,
+  fmtMoney,
+  fmtPct,
+  normalizeCounty,
+  packetUrl,
+  type CompAnalysis,
 } from '../lib/api'
 import { captureLead } from '../lib/firebase'
 
 export default function Property() {
-  const { propertyId } = useParams<{ propertyId: string }>()
+  const { county: countyParam, propertyId } = useParams<{ county?: string; propertyId: string }>()
+  const county = normalizeCounty(countyParam)
   const navigate = useNavigate()
   const [analysis, setAnalysis] = useState<CompAnalysis | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!propertyId) return
-    analyzeParcel(parseInt(propertyId, 10))
+    setAnalysis(null)
+    setError(null)
+    analyzeParcel(county, propertyId)
       .then(setAnalysis)
       .catch((e: unknown) => setError(e instanceof Error ? e.message : 'Failed to load'))
-  }, [propertyId])
+  }, [county, propertyId])
 
   if (error) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
         <p className="text-red-700">Error: {error}</p>
-        <Link to="/" className="text-bcad-700 underline mt-4 inline-block">
-          ← Try another address
+        <Link to={`/?county=${county}`} className="text-bcad-700 underline mt-4 inline-block">
+          Back to search
         </Link>
       </div>
     )
@@ -32,22 +40,22 @@ export default function Property() {
   if (!analysis) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-bcad-900/60">
-        Analyzing…
+        Analyzing...
       </div>
     )
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
-      <Link to="/" className="text-sm text-bcad-700 hover:underline">
-        ← Search another address
+      <Link to={`/?county=${analysis.county.id}`} className="text-sm text-bcad-700 hover:underline">
+        Search another {analysis.county.short_label} address
       </Link>
 
       <h1 className="mt-4 text-2xl font-bold text-bcad-700">
         {analysis.subject.SitusAddress}
       </h1>
       <p className="text-sm text-bcad-900/70">
-        Owner: {analysis.subject.OwnerFullName} &middot; BCAD Property ID&nbsp;
+        Owner: {analysis.subject.OwnerFullName} &middot; {analysis.county.property_id_label}{' '}
         {analysis.subject.PropertyId}
       </p>
 
@@ -59,7 +67,8 @@ export default function Property() {
 }
 
 function Protestable({
-  analysis, onLeadCaptured,
+  analysis,
+  onLeadCaptured,
 }: {
   analysis: CompAnalysis
   onLeadCaptured: () => void
@@ -67,6 +76,9 @@ function Protestable({
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitErr, setSubmitErr] = useState<string | null>(null)
+  const savingsValue = analysis.estimated_annual_tax_savings == null
+    ? 'Varies by tax district'
+    : fmtMoney(analysis.estimated_annual_tax_savings)
 
   async function handleDownload(e: FormEvent) {
     e.preventDefault()
@@ -74,10 +86,13 @@ function Protestable({
       setSubmitErr('Please enter a valid email')
       return
     }
-    setSubmitting(true); setSubmitErr(null)
+    setSubmitting(true)
+    setSubmitErr(null)
     try {
       await captureLead({
         email,
+        county: analysis.county.id,
+        countyLabel: analysis.county.label,
         propertyId: analysis.subject.PropertyId,
         situsAddress: analysis.subject.SitusAddress,
         owner: analysis.subject.OwnerFullName,
@@ -89,8 +104,7 @@ function Protestable({
         requestType: 'packet',
         reason: analysis.reason,
       })
-      // Trigger PDF download in a new tab; navigate to thanks page after.
-      window.open(packetUrl(analysis.subject.PropertyId), '_blank')
+      window.open(packetUrl(analysis.county.id, analysis.subject.PropertyId), '_blank')
       setTimeout(onLeadCaptured, 600)
     } catch (e: unknown) {
       setSubmitErr(e instanceof Error ? e.message : 'Could not save your email')
@@ -102,7 +116,7 @@ function Protestable({
   return (
     <>
       <div className="mt-6 grid sm:grid-cols-4 gap-3">
-        <Card label="BCAD Appraised" value={fmtMoney(analysis.subject.AppraisedValue)} />
+        <Card label={analysis.county.appraisal_label} value={fmtMoney(analysis.subject.AppraisedValue)} />
         <Card label="Recommended Value" value={fmtMoney(analysis.target_value)} />
         <Card
           label="Estimated Reduction"
@@ -110,18 +124,19 @@ function Protestable({
           accent
         />
         <Card
-          label="Annual Tax Savings"
-          value={fmtMoney(analysis.estimated_annual_tax_savings)}
-          accent
+          label="Tax Impact"
+          value={savingsValue}
+          accent={analysis.estimated_annual_tax_savings != null}
         />
       </div>
 
       <p className="mt-6 text-bcad-900/80">
-        Your BCAD appraisal of <strong>{fmtMoney(analysis.subject.AppraisedValue)}</strong>
-        &nbsp;exceeds the median of {analysis.comp_count_total} comparable properties
-        in the same {analysis.geography_tier_used === 'CB+BLK' ? 'city block (BLK)' : 'city block'}
-        &nbsp;(median: <strong>{fmtMoney(analysis.median_appraised)}</strong>). This is
-        grounds for a protest under <em>Tex. Tax Code §41.43(b)(3)</em>.
+        Your {analysis.county.assessor_short} value of{' '}
+        <strong>{fmtMoney(analysis.subject.AppraisedValue)}</strong> exceeds the median of{' '}
+        {analysis.comp_count_total} comparable properties in the{' '}
+        <strong>{analysis.geography_tier_used}</strong> comp set (median:{' '}
+        <strong>{fmtMoney(analysis.median_appraised)}</strong>). This may support a{' '}
+        {analysis.county.appeal_label} using {analysis.county.evidence_basis}.
       </p>
 
       <h2 className="mt-8 text-lg font-semibold text-bcad-700">Comparable properties</h2>
@@ -132,8 +147,8 @@ function Protestable({
           Get your evidence packet
         </h2>
         <p className="mt-1 text-sm text-bcad-900/70">
-          A 4-page PDF you attach to your BCAD E-File protest. Includes the comp grid,
-          methodology, and filing instructions. Free.
+          A PDF packet with the comp grid, methodology, and filing notes for your{' '}
+          {analysis.county.label} {analysis.county.appeal_label}. Free.
         </p>
         <form onSubmit={handleDownload} className="mt-4 flex flex-col sm:flex-row gap-3">
           <input
@@ -149,14 +164,12 @@ function Protestable({
             disabled={submitting}
             className="bg-bcad-700 text-white px-5 py-2 rounded-md hover:bg-bcad-900 disabled:opacity-50"
           >
-            {submitting ? 'Preparing…' : 'Download evidence packet'}
+            {submitting ? 'Preparing...' : 'Download evidence packet'}
           </button>
         </form>
-        {submitErr && (
-          <p className="mt-2 text-sm text-red-700">{submitErr}</p>
-        )}
+        {submitErr && <p className="mt-2 text-sm text-red-700">{submitErr}</p>}
         <p className="mt-3 text-xs text-bcad-900/50">
-          We&apos;ll email you reminders about the May 15 deadline and follow-up tips.
+          We store your email with this address so you can receive deadline reminders and follow-up tips.
           No spam, no sharing.
         </p>
       </div>
@@ -174,29 +187,27 @@ function NotProtestable({ analysis }: { analysis: CompAnalysis }) {
       {isNotOver && (
         <>
           <h2 className="text-lg font-semibold text-bcad-700">
-            Your appraisal looks fair
+            Your value looks in range
           </h2>
           <p className="mt-2 text-bcad-900/80">
-            Your BCAD appraisal of <strong>{fmtMoney(analysis.subject.AppraisedValue)}</strong>
-            &nbsp;is at or below the median of {analysis.comp_count_total} comparable
-            properties (<strong>{fmtMoney(analysis.median_appraised)}</strong>). Our
-            unequal-appraisal analysis doesn&apos;t support a reduction. You may still
-            have other grounds — recent storm damage, deferred maintenance, or a
-            recent purchase price below BCAD&apos;s value all justify protesting.
+            Your {analysis.county.assessor_short} value of{' '}
+            <strong>{fmtMoney(analysis.subject.AppraisedValue)}</strong> is at or below the
+            median of {analysis.comp_count_total} tight comparable properties (
+            <strong>{fmtMoney(analysis.median_appraised)}</strong>). This comparable-value
+            screen does not support a reduction, but condition issues, recent purchase price,
+            or recent nearby sales may still matter.
           </p>
         </>
       )}
       {isInsufficient && (
         <>
           <h2 className="text-lg font-semibold text-bcad-700">
-            Not enough nearby comparable properties
+            Not enough tight comparable properties
           </h2>
           <p className="mt-2 text-bcad-900/80">
-            We couldn&apos;t find at least 5 comparable properties in the same city
-            block. This usually happens with acreage parcels, condos, or properties
-            in newer subdivisions. Filing a protest is still worthwhile — you just
-            need different evidence (recent sales, condition photos, contractor
-            estimates).
+            We could not find at least 5 comparable properties using this county's tight
+            comp rules. Filing may still be worthwhile if you have recent sales, condition
+            photos, repair estimates, or other property-specific evidence.
           </p>
         </>
       )}
@@ -206,22 +217,21 @@ function NotProtestable({ analysis }: { analysis: CompAnalysis }) {
             This property needs a second look
           </h2>
           <p className="mt-2 text-bcad-900/80">
-            Our analysis suggests a large reduction, but the data is too coarse to
-            credibly assert that without seeing the property in person. Leave your
-            email below and we&apos;ll follow up.
+            The math suggests a large reduction, but the public data is too coarse to
+            claim it confidently without human review. Leave your email below and we will
+            follow up.
           </p>
         </>
       )}
 
       <div className="mt-5 rounded bg-bcad-50 border border-bcad-100 p-4 text-sm">
         <p className="font-semibold text-bcad-700">
-          File anyway by Friday, May 15
+          Deadline: {analysis.county.deadline}
         </p>
         <p className="mt-1 text-bcad-900/80">
-          2026 is the first <strong>biennial</strong> year — your locked value sets
-          the baseline for 2027 too. Protesting has zero downside; your value can&apos;t
-          increase as a result. File Form&nbsp;50-132 on bcad.org with your Owner ID
-          and PIN.
+          You remain responsible for filing your own {analysis.county.label}{' '}
+          {analysis.county.appeal_label}. This tool is a screening aid built from public
+          appraisal data.
         </p>
       </div>
 
@@ -248,6 +258,8 @@ function InfoRequestForm({ analysis }: { analysis: CompAnalysis }) {
     try {
       await captureLead({
         email,
+        county: analysis.county.id,
+        countyLabel: analysis.county.label,
         propertyId: analysis.subject.PropertyId,
         situsAddress: analysis.subject.SitusAddress,
         owner: analysis.subject.OwnerFullName,
@@ -297,7 +309,7 @@ function InfoRequestForm({ analysis }: { analysis: CompAnalysis }) {
       </div>
       {submitErr && <p className="mt-2 text-sm text-red-700">{submitErr}</p>}
       <p className="mt-3 text-xs text-bcad-900/50">
-        We store the email with this property address so you can get follow-up help.
+        We store the email with this county, property address, and value summary.
       </p>
     </form>
   )
@@ -322,26 +334,26 @@ function CompTable({ analysis }: { analysis: CompAnalysis }) {
           <tr>
             <th className="text-left px-3 py-2">#</th>
             <th className="text-left px-3 py-2">Address</th>
-            <th className="text-right px-3 py-2">BCAD Appraised</th>
+            <th className="text-right px-3 py-2">{analysis.county.appraisal_label}</th>
             <th className="text-right px-3 py-2">vs. Your Value</th>
           </tr>
         </thead>
         <tbody>
           <tr className="bg-amber-50 font-semibold">
-            <td className="px-3 py-2">★</td>
-            <td className="px-3 py-2">YOU — {analysis.subject.SitusAddress}</td>
+            <td className="px-3 py-2">*</td>
+            <td className="px-3 py-2">YOU - {analysis.subject.SitusAddress}</td>
             <td className="px-3 py-2 text-right">{fmtMoney(analysis.subject.AppraisedValue)}</td>
-            <td className="px-3 py-2 text-right">—</td>
+            <td className="px-3 py-2 text-right">-</td>
           </tr>
           {analysis.comps.map((c, i) => {
             const diff = c.appraised_value - analysis.subject.AppraisedValue
             return (
-              <tr key={c.property_id} className="cmp-row">
+              <tr key={`${c.county}-${c.property_id}`} className="cmp-row">
                 <td className="px-3 py-2 text-bcad-900/50">{i + 1}</td>
                 <td className="px-3 py-2">{c.situs_address}</td>
                 <td className="px-3 py-2 text-right">{fmtMoney(c.appraised_value)}</td>
                 <td className={`px-3 py-2 text-right ${diff < 0 ? 'text-money' : 'text-bcad-900/60'}`}>
-                  {diff < 0 ? '−' : '+'}{fmtMoney(Math.abs(diff))}
+                  {diff < 0 ? '-' : '+'}{fmtMoney(Math.abs(diff))}
                 </td>
               </tr>
             )

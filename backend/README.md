@@ -1,58 +1,59 @@
-# Backend — BCAD Protest Helper API
+# Backend - Property Protest Helper API
 
-FastAPI service exposing search, analysis, and PDF generation over the
-2026 BCAD certified appraisal roll. Stateless; the only state is a
-read-only ~210 MB SQLite database bundled into the Docker image.
+FastAPI service exposing search, analysis, and PDF generation over normalized
+Bexar County and Arapahoe County appraisal rolls. Stateless; the only state is a
+read-only SQLite database bundled into the Docker image.
 
 ## Files
 
-- `api.py` — FastAPI app with 4 endpoints
-- `comp_engine.py` — Tex. Tax Code §41.43(b)(3) unequal-appraisal logic
-- `pdf_packet.py` — 4-page ReportLab evidence packet generator
-- `build_db.py` — Builds `bcad.db` from the BCAD CSV (run locally, then bundle)
-- `Dockerfile` — Cloud Run image
-- `requirements.txt` — Python deps
+- `api.py` - FastAPI app with county-aware endpoints
+- `comp_engine.py` - County-aware comparable-value logic
+- `pdf_packet.py` - ReportLab evidence packet generator
+- `build_db.py` - Builds `bcad.db` from county CSVs
+- `Dockerfile` - Cloud Run image
+- `requirements.txt` - Python dependencies
 
-## Build the database (one-time, local)
+## Build the database
 
 ```bash
 cd backend
 pip install -r requirements.txt
-python build_db.py /path/to/bexar_county_all_properties_sorted_by_proximity_to_78233.csv ./bcad.db
+
+# Bexar only
+python build_db.py /path/to/bexar.csv ./bcad.db
+
+# Bexar + Arapahoe
+python build_db.py /path/to/bexar.csv /path/to/arapahoe.csv ./bcad.db
 ```
 
-Produces `./bcad.db` (~210 MB). Re-run when BCAD republishes the roll.
+Re-run when either county republishes the roll. Do not commit `bcad.db`.
 
 ## Local dev
 
 ```bash
 DB_PATH=./bcad.db uvicorn api:app --reload --port 8080
-# Visit http://localhost:8080/healthz
 ```
 
 ## Deploy to Cloud Run
 
 ```bash
-# bcad.db must be in the build context — Dockerfile COPYs it into the image
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-
 gcloud run deploy protest-helper \
     --source . \
     --region us-central1 \
     --allow-unauthenticated \
     --memory 1Gi --cpu 1 \
     --max-instances 10 \
-    --set-env-vars PRODUCT_NAME="Bexar Protest Helper",CORS_ORIGINS="https://YOUR-DOMAIN.com,https://YOUR-PROJECT.web.app"
+    --set-env-vars PRODUCT_NAME="Bexar + Arapahoe Protest Helper",CORS_ORIGINS="*"
 ```
-
-Cold start ~3-4s; subsequent requests sub-100ms. Image will be ~250 MB.
 
 ## Endpoints
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | `/healthz` | `{ok: true, parcels: 699751}` |
-| GET | `/search?q=text&limit=10` | List matching parcels by address |
-| GET | `/analyze/{property_id}` | Full CompAnalysis JSON |
-| GET | `/packet/{property_id}` | PDF download (400 if not protestable) |
+| GET | `/healthz` | Health plus total/county parcel counts |
+| GET | `/counties` | Supported county metadata |
+| GET | `/search?county=bexar&q=text&limit=10` | List matching parcels by address |
+| GET | `/analyze/{county}/{property_id}` | Full analysis JSON |
+| GET | `/packet/{county}/{property_id}` | PDF download when comps support a reduction |
+
+Legacy Bexar routes `/analyze/{property_id}` and `/packet/{property_id}` remain available.

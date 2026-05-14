@@ -5,7 +5,14 @@
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
-        "source": "/healthz**",
+        "source": "/healthz",
+        "run": {
+          "serviceId": "protest-helper",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/health",
         "run": {
           "serviceId": "protest-helper",
           "region": "us-central1"
@@ -13,6 +20,13 @@
       },
       {
         "source": "/search",
+        "run": {
+          "serviceId": "protest-helper",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/counties",
         "run": {
           "serviceId": "protest-helper",
           "region": "us-central1"

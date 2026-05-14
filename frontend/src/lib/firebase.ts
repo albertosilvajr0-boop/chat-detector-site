@@ -42,7 +42,9 @@ if (config.apiKey && config.projectId) {
 
 export interface Lead {
   email: string
-  propertyId: number
+  county: string
+  countyLabel?: string
+  propertyId: string
   situsAddress?: string
   owner?: string
   appraisedValue?: number
@@ -112,7 +114,9 @@ export async function listLeads(maxLeads = 100): Promise<AdminLead[]> {
     return {
       id: doc.id,
       email: stringValue(data.email),
-      propertyId: numberValue(data.propertyId),
+      county: optionalString(data.county) ?? 'bexar',
+      countyLabel: optionalString(data.countyLabel),
+      propertyId: idValue(data.propertyId),
       situsAddress: optionalString(data.situsAddress),
       owner: optionalString(data.owner),
       appraisedValue: optionalNumber(data.appraisedValue),
@@ -133,8 +137,10 @@ function stringValue(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
-function numberValue(value: unknown): number {
-  return typeof value === 'number' ? value : 0
+function idValue(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number') return String(value)
+  return ''
 }
 
 function optionalString(value: unknown): string | undefined {
