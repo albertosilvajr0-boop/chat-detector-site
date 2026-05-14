@@ -121,6 +121,6 @@ jobs:
           import api
 
           result = api.healthz()
-          assert result == {"ok": True, "parcels": 2}, result
+          assert result == {"ok": True, "parcels": 2, "counties": {"bexar": 2}}, result
           print(result)
           PY
